@@ -16,9 +16,10 @@ class RuleFactoryImpl extends RuleFactory[RuleSequenceImpl] {
   override def rules(): List[RuleSequenceImpl] = {
     Range(1, num).map((i: Int) => {
       def foo(i: Int): RuleSequenceImpl = {
-        val `val`: String = Integer.toString(i, 2)
+        var theValue: String = Integer.toString(i, 2)
         val maximumLength: String = Integer.toString(num - 1, 2)
-        new RuleSequenceImpl(`val`, maximumLength.length)
+        Range(0,maximumLength.length-theValue.length).foreach(_ => theValue = "0"+theValue)
+        new RuleSequenceImpl(theValue, maximumLength.length)
       }
       foo(i)
     }).distinct.toList
@@ -28,10 +29,9 @@ class RuleFactoryImpl extends RuleFactory[RuleSequenceImpl] {
 class RuleSequenceImpl(val value: String, val maxLength: Integer) extends AbstractRule {
 
   var prev: Array[Integer] = Array(-1, -1, -1, -1, -1, -1, -1, -1);
-  val sym: Array[Integer] = new Array[Integer](maxLength);
+  var sym: Array[Integer] = new Array[Integer](maxLength);
   val lookback: Integer = 3;
 
-  Array.fill(maxLength - value.length)(elem = 0)
   val splitted: Array[String] = value.split("");
   for((s,i) <- splitted.zipWithIndex){
       sym(i) = Integer.parseInt(s)
