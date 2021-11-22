@@ -82,7 +82,7 @@ class RuleSequenceImpl(val value: String, val maxLength: Integer) extends Abstra
          numOver = i + lookback - sym.length
          numCopied = lookback - numOver
        }
-       System.arraycopy(inPrev, i, neighbour, 0, if (i + lookback > sym.length) sym.length - i else i + lookback)
+       System.arraycopy(inPrev, i, neighbour, 0, if (i + lookback > sym.length-1) lookback - numOver else lookback)
        if (i + lookback > sym.length) System.arraycopy(inPrev, 0, neighbour, numCopied, numOver)
        toPrev(i) = nextVal(neighbour)
      }
