@@ -11,6 +11,13 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="sbt: org.apiguardian:apiguardian-api:1.1.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.assertj:assertj-core:3.9.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.junit.jupiter:junit-jupiter-api:5.8.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.junit.jupiter:junit-jupiter-engine:5.8.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.junit.platform:junit-platform-commons:1.8.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.junit.platform:junit-platform-engine:1.8.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.opentest4j:opentest4j:1.2.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.7:jar" level="project" />
   </component>
 </module>
