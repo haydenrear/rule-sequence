@@ -3,7 +3,6 @@ publishMavenStyle := true
 crossPaths := false
 publishConfiguration := publishConfiguration.value.withOverwrite(true)
 publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
-
 publishTo := {
   Some(MavenCache("local-maven", file("~/.m2/repository")))
 }

@@ -1,63 +1,82 @@
 package com.hayden.rules
 
+import java.util
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
 trait RuleFactory[A <: AbstractRule] {
   def rules(): List[A];
+  def sequences(size: Int): List[List[Int]];
 }
 
 trait AbstractRule {
-  def sequence(initialState: Array[Integer]): Iterator[Array[Integer]]
-  def reset(initialState: Array[Integer]): Unit
-  def initialState(): Array[Integer]
+  def sequence(initialState: Array[Int]): Iterator[Array[Int]]
+  def reset(initialState: Array[Int]): Unit
+  def initialState(): Array[Int]
 }
 
-class RuleFactoryImpl extends RuleFactory[RuleSequenceImpl] {
-  private[rules] val num: Int = 256
+class RuleFactoryImpl(num: Int = 256) extends RuleFactory[RuleSequenceImpl] {
+
+  var rulesCache: List[RuleSequenceImpl] = List()
 
   override def rules(): List[RuleSequenceImpl] = {
-    Range(1, num).map((i: Int) => {
-      def foo(i: Int): RuleSequenceImpl = {
-        var theValue: String = Integer.toString(i, 2)
-        val maximumLength: String = Integer.toString(num - 1, 2)
-        Range(0,maximumLength.length-theValue.length).foreach(_ => theValue = "0"+theValue)
-        new RuleSequenceImpl(theValue, maximumLength.length)
-      }
-      foo(i)
-    }).distinct.toList
+    def singleRuleSequence(i: Int): RuleSequenceImpl = {
+      var theValue: String = Integer.toString(i, 2)
+      val maximumLength: String = Integer.toString(num - 1, 2)
+      Range(0, maximumLength.length - theValue.length).foreach(_ => theValue = "0" + theValue)
+      new RuleSequenceImpl(theValue, maximumLength.length)
+    }
+    if(rulesCache.length == 256){
+      return rulesCache
+    } else {
+      rulesCache = Range(0, num).map((i: Int) => {
+        singleRuleSequence(i)
+      }).toList
+    }
+    rulesCache
+  }
+
+  override def sequences(size: Int): List[List[Int]] = {
+    rules().map(r => {
+      val sequence = r.sequence(r.initialState())
+      println(r.initialState().mkString("Array(", ", ", ")"))
+      Range(0,size).flatMap(_ => sequence.next()).toList;
+    })
   }
 }
 
-class RuleSequenceImpl(val value: String, val maxLength: Integer) extends AbstractRule {
+class RuleSequenceImpl(val value: String, val maxLength: Int) extends AbstractRule {
 
-  var prev: Array[Integer] = Array(-1, -1, -1, -1, -1, -1, -1, -1);
-  var sym: Array[Integer] = new Array[Integer](maxLength);
-  val lookback: Integer = 3;
+  var prev: Array[Int] = Array(-1, -1, -1, -1, -1, -1, -1, -1);
+  var sym: Array[Int] = new Array[Int](maxLength);
+  val lookback: Int= 3;
 
   val splitted: Array[String] = value.split("");
   for((s,i) <- splitted.zipWithIndex){
       sym(i) = Integer.parseInt(s)
   }
 
-  override def initialState(): Array[Integer] = sym
+  override def initialState(): Array[Int] = sym
 
-  override def sequence(initialState: Array[Integer]): Iterator[Array[Integer]] = {
-    new Iterator[Array[Integer]]() {
+  override def sequence(initialState: Array[Int]): Iterator[Array[Int]] = {
+    new Iterator[Array[Int]]() {
 
-      var state: Array[Integer] = initialState;
+      var state: Array[Int] = initialState;
 
       override def hasNext: Boolean = true
 
-      override def next(): Array[Integer] = {
+      override def next(): Array[Int] = {
         state = ruleSequence().apply();
         state;
       }
     }
   }
 
-  override def reset(initialState: Array[Integer]): Unit = {
+  override def reset(initialState: Array[Int]): Unit = {
     prev = initialState;
   }
 
-  def nextVal(neighbors: Array[Integer]): Integer = {
+  def nextVal(neighbors: Array[Int]): Int= {
     val toParse = new StringBuilder
     for (v <- neighbors) {
       toParse.append(v)
@@ -66,16 +85,16 @@ class RuleSequenceImpl(val value: String, val maxLength: Integer) extends Abstra
     sym(i)
   }
 
-  def ruleSequence(): () => Array[Integer] = {
+  def ruleSequence(): () => Array[Int] = {
    () => {
-     var inPrev: Array[Integer] = null
+     var inPrev: Array[Int] = null
      if(prev(0) == -1)
         inPrev = Array.copyOf(sym, sym.length)
      else
        inPrev = Array.copyOf(prev, prev.length)
-     val toPrev = new Array[Integer](sym.length)
+     val toPrev = new Array[Int](sym.length)
      for((_,i) <- sym.zipWithIndex){
-       val neighbour: Array[Integer] = new Array[Integer](lookback)
+       val neighbour: Array[Int] = new Array[Int](lookback)
        var numOver = 0
        var numCopied = 0
        if(i + lookback > sym.length){
