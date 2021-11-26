@@ -20,7 +20,9 @@ class RuleFactoryTest {
 
   @Test
   def testCreateRuleSequence(): Unit = {
-    assertThat(rules.length).isEqualTo(255)
+    assertThat(rules.length).isEqualTo(256)
     ruleFactory.sequences(10).foreach(it => println(it));
   }
+
+
 }

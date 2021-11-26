@@ -1,3 +1,5 @@
+import sbt.internal.DslEntry
+
 resolvers += Resolver.mavenLocal
 publishMavenStyle := true
 crossPaths := false

@@ -1,12 +1,13 @@
 package com.hayden.rules
 
 import java.util
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import java.util.stream.{IntStream}
+import scala.jdk.CollectionConverters._
 
 trait RuleFactory[A <: AbstractRule] {
-  def rules(): List[A];
-  def sequences(size: Int): List[List[Int]];
+  def num: Int = 256
+  def rules(): List[A]
+  def sequences(size: Int): java.util.List[java.util.List[Integer]]
 }
 
 trait AbstractRule {
@@ -15,8 +16,7 @@ trait AbstractRule {
   def initialState(): Array[Int]
 }
 
-class RuleFactoryImpl(num: Int = 256) extends RuleFactory[RuleSequenceImpl] {
-
+class RuleFactoryImpl(num: Int=256) extends RuleFactory[RuleSequenceImpl] {
   var rulesCache: List[RuleSequenceImpl] = List()
 
   override def rules(): List[RuleSequenceImpl] = {
@@ -36,13 +36,14 @@ class RuleFactoryImpl(num: Int = 256) extends RuleFactory[RuleSequenceImpl] {
     rulesCache
   }
 
-  override def sequences(size: Int): List[List[Int]] = {
+  override def sequences(size: Int = 10): java.util.List[java.util.List[Integer]] = {
     rules().map(r => {
       val sequence = r.sequence(r.initialState())
-      println(r.initialState().mkString("Array(", ", ", ")"))
-      Range(0,size).flatMap(_ => sequence.next()).toList;
-    })
+      val innerLst: java.util.List[Integer] = IntStream.range(0, size).flatMap(_ => util.Arrays.stream(sequence.next()).map(i => i)).boxed().toList
+      innerLst;
+    }).asJava;
   }
+
 }
 
 class RuleSequenceImpl(val value: String, val maxLength: Int) extends AbstractRule {
